@@ -23,7 +23,9 @@ app.get('/', (req, res)=> res.send("API is working"))
 app.use('/api/admin', adminRouter)
 app.use('/api/blog', blogRouter)
 
-
+// // For regular users (public routes)
+// adminRouter.post("/user/signup", userSignup);
+// adminRouter.post("/user/login", userLogin);
 
 
 const PORT = process.env.PORT || 3000;

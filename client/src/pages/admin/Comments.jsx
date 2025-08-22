@@ -1,15 +1,33 @@
 import React, { useEffect, useState } from 'react'
-import { comments_data } from '../../assets/assets'
+// import { comments_data } from '../../assets/assets'
 import CommentTableItem from '../../components/admin/CommentTableItem'
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast'
+// import { data } from 'react-router-dom'
 
 const Comments = () => {
 
   const [comments, setComments] = useState([])
-  const [filter, setFilter] = useState('Not Apporoved')
+  const [filter, setFilter] = useState('Not Approved')
 
-  const fetchComments = async ()=>{
-    setComments(comments_data)
+  const {axios} = useAppContext();
+
+  const fetchComments = async () => {
+  try {
+    console.log('🔄 Fetching comments from API...');
+    const {data} = await axios.get('/api/admin/comments')
+    
+    if (data.success) {
+      console.log(`✅ Found ${data.comments.length} comments`);
+      setComments(data.comments); // This should update the state
+    } else {
+      toast.error(data.message)
+    }
+  } catch (error) {
+    console.error('❌ Fetch error:', error);
+    toast.error(error.message)
   }
+}
 
 useEffect(() => {
     fetchComments()
@@ -24,7 +42,7 @@ useEffect(() => {
                   cursor-pointer text-xs ${filter === 'Approved' ? 'text-primary' : 'text-gray-700'}`}>Apporoved</button>
 
                   <button onClick={() => setFilter('Not Approved')} className={`shadow-custom-sm border rounded-full px-4 py-1
-                  cursor-pointer text-xs ${filter === 'Not Approved' ? 'text-primary' : 'text-gray-700'}`}>Not Apporoved</button>
+                  cursor-pointer text-xs ${filter === 'Not Approved' ? 'text-primary' : 'text-gray-700'}`}>Not Approved</button>
 
             </div>
         </div>
