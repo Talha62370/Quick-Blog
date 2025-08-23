@@ -1,2 +1,26 @@
-node_modules
+# dependencies
+node_modules/
+
+# env files
 .env
+.env.*
+!.env.example   # allow only the template
+
+# logs & caches
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# builds & coverage
+dist/
+build/
+.out/
+.next/
+coverage/
+
+# misc
+.DS_Store
+.env.local
