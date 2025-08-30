@@ -1,26 +1,101 @@
 import jwt from 'jsonwebtoken'
 import Blog from '../models/Blog.js';
 import Comment from '../models/comment.js';
+import User from '../models/user.js'
 
 
- 
+ export const register = async (req, res) => {
+    try {
+        const { email, password, role } = req.body;
+
+        // Check if this is the first user - make them admin automatically
+        const userCount = await User.countDocuments();
+        const actualRole = userCount === 0 ? 'admin' : role;
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "User already exists" 
+            });
+        }
+
+        // Create new user
+        const user = await User.create({ email, password, role });
+        
+        // Generate token
+        const token = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.status(201).json({
+            success: true,
+            token,
+            user: { 
+                id: user._id, 
+                email: user.email, 
+                role: user.role 
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+};
+
 
 
 
 export const adminLogin = async (req, res) => {
-  try {
-    const {email, password} = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if(email !== process.env.ADMIN_EMAIL || password !== process.env.
-     ADMIN_PASSWORD){
-   return res.json({success: false, message: "Invalid Credentials"})
-}
- const token =jwt.sign({email}, process.env.JWT_SECRET)
- res.json({success: true, token})
-  } catch (error) {
-    res.json({success: false, message: error.message})
-  }
-}
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid credentials" 
+            });
+        }
+
+        // Check password
+        const isPasswordValid = await user.comparePassword(password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid credentials" 
+            });
+        }
+
+        // Generate token
+        const token = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            success: true,
+            token,
+            user: { 
+                id: user._id, 
+                email: user.email, 
+                role: user.role 
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+};
 
 export const getAllBlogsAdmin = async (req, res) => {
     try {

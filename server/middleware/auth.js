@@ -1,14 +1,36 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
+import User from '../models/user.js';
 
-const auth = (req, res, next) => {
-    const token = req.headers.authorization;
-
+const auth = async (req, res, next) => {
     try {
-        jwt.verify(token, process.env.JWT_SECRET)
-        next()
+        const token = req.headers.authorization;
+        
+        if (!token) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "No token provided" 
+            });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Verify user still exists in database
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "User not found" 
+            });
+        }
+
+        req.user = decoded;
+        next();
     } catch (error) {
-        res.json({success: false, message: "Invalid token"})
+        res.status(401).json({ 
+            success: false, 
+            message: "Invalid token" 
+        });
     }
-}
+};
 
 export default auth;

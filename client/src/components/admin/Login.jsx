@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom';
 
 const Login = () => {
 
@@ -55,6 +56,14 @@ const Login = () => {
               <button type='submit' className='w-full py-3 font-medium bg-primary
               text-white rounded cursor-pointer hover:bg-primary/90
               transition-all'>Login</button>
+
+            <p className='mt-4 text-center text-sm text-gray-600'>
+              Don't have an account?{' '}
+              <Link to="/register" className='text-primary hover:underline font-medium'>
+                Register here
+              </Link>
+            </p>
+
             </form>
         </div>
       </div>
