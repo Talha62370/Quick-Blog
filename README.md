@@ -1,10 +1,5 @@
 # QuickBlog 🚀
 
-#Login email
-admin@example.com
-*password
-talhamalick
-
 A modern, full-stack blogging platform built with React, Node.js, and MongoDB. Features AI-powered content generation, real-time comments, and a beautiful admin dashboard.
 
 - **📝 AI-Powered Blog Creation** - Generate content using Gemini AI
